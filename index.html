@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Commissioning Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tab-btn.active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Commissioning Report Dashboard</h1>
+                <p class="text-sm text-slate-500">PT PAL Indonesia | 22 - 30 Juni 2026</p>
+            </div>
+            <div class="hidden md:flex items-center space-x-2">
+                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-200">Executive View (CTO)</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start space-x-4">
+                <div class="bg-emerald-100 p-3 rounded-full text-emerald-600">
+                    <i class="fas fa-check-circle text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">1 Ton Heli Hangar Crane</h3>
+                    <span class="inline-block mt-1 bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded">COMPLETED</span>
+                    <p class="mt-2 text-sm text-slate-600">Commissioning dan load test berhasil diselesaikan dan diterima oleh semua pihak (Maker, Shipyard, Owner).</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start space-x-4">
+                <div class="bg-red-100 p-3 rounded-full text-red-600">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">1.5 Ton Marine Monorail Crane</h3>
+                    <span class="inline-block mt-1 bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">SUSPENDED</span>
+                    <p class="mt-2 text-sm text-slate-600">Ditangguhkan sementara menunggu verifikasi struktur dek, penguatan, dan recommissioning.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-md font-bold text-slate-900 mb-4 border-b pb-2"><i class="fas fa-chart-bar mr-2"></i>Analisis Defleksi Dek</h3>
+                    <div class="relative h-48 w-full">
+                        <canvas id="deflectionChart"></canvas>
+                    </div>
+                    <div class="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-800">
+                        <strong>Over-limit!</strong> Defleksi aktual (3.01 mm) melebihi batas aman pabrikan (2.0 mm) sebesar <strong>~50.5%</strong>.
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-md font-bold text-slate-900 mb-4 border-b pb-2"><i class="fas fa-search mr-2"></i>Akar Masalah (1.5T)</h3>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start"><i class="fas fa-dot-circle text-blue-500 mt-1 mr-2 text-xs"></i> <span><strong>Beban Tambahan (AHU):</strong> Instalasi HVAC/AHU tepat di atas runway crane menyumbang beban statis signifikan.</span></li>
+                        <li class="flex items-start"><i class="fas fa-dot-circle text-blue-500 mt-1 mr-2 text-xs"></i> <span><strong>Deformasi Struktural:</strong> Beban berlebih menyebabkan lendutan dek di atas batas toleransi.</span></li>
+                        <li class="flex items-start"><i class="fas fa-dot-circle text-blue-500 mt-1 mr-2 text-xs"></i> <span><strong>Dampak Operasional:</strong> Roda macet (jamming), main beam melintir, dan indikasi overload pada motor.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                
+                <div class="flex border-b border-slate-200 mb-6">
+                    <button class="tab-btn active px-4 py-2 text-sm text-slate-500 hover:text-slate-800 focus:outline-none" onclick="openTab(event, 'action-plan')">Action Plan</button>
+                    <button class="tab-btn px-4 py-2 text-sm text-slate-500 hover:text-slate-800 focus:outline-none" onclick="openTab(event, 'daily-log')">Daily Log Reference</button>
+                </div>
+
+                <div id="action-plan" class="tab-content active">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Rekomendasi Tindak Lanjut (Shipyard & YFM)</h3>
+                    <div class="space-y-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold">1</div>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-semibold text-slate-800">Verifikasi Analisis Struktur</h4>
+                                <p class="text-sm text-slate-600 mt-1">Tim desain kapal (Ship Design Team) harus melakukan perhitungan ulang rigiditas struktur lambung atas yang menopang crane, termasuk memperhitungkan beban mati dari unit AHU.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold">2</div>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-semibold text-slate-800">Pengukuran Geometri Presisi</h4>
+                                <p class="text-sm text-slate-600 mt-1">Menggunakan Laser Scanner/Tracker untuk memverifikasi kedataran (flatness), kelurusan (straightness), dan keselarasan elevasi 8 roda penyangga.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold">3</div>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-semibold text-slate-800">Perkuatan Struktural (Reinforcement)</h4>
+                                <p class="text-sm text-slate-600 mt-1">Shipyard wajib melakukan modifikasi/penguatan struktur agar defleksi kembali berada di bawah batas toleransi 2.0 mm sebelum operasional crane dilanjutkan.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold">4</div>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-semibold text-slate-800">Recommissioning</h4>
+                                <p class="text-sm text-slate-600 mt-1">Setelah perbaikan struktural dikonfirmasi, tim YFM akan mengecek ulang alignment dan melakukan pengujian fungsional final.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="daily-log" class="tab-content">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Log Harian Commissioning (22-29 Juni 2026)</h3>
+                    <div class="relative border-l border-slate-200 ml-3 space-y-6">
+                        <div class="mb-8 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white text-blue-600 text-xs font-bold">22</span>
+                            <h4 class="font-semibold text-slate-800">22-24 Juni: Persiapan & Pengujian Awal</h4>
+                            <p class="text-sm text-slate-600 mt-1">Koordinasi PMT Frigate. Inspeksi awal dan no-load running test. 1T Crane berjalan normal, namun 1.5T Crane menunjukkan indikasi isu alignment saat pergerakan travelling.</p>
+                        </div>
+                        <div class="mb-8 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-emerald-100 rounded-full -left-3 ring-8 ring-white text-emerald-600 text-xs font-bold">25</span>
+                            <h4 class="font-semibold text-slate-800">25 Juni: 1T Crane Selesai</h4>
+                            <p class="text-sm text-slate-600 mt-1">1T Crane berhasil melewati Load Test dan diterima. 1.5T Crane dicoba diperbaiki dengan shim/washer, namun tetap menunjukkan indikasi overload.</p>
+                        </div>
+                        <div class="mb-8 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-red-100 rounded-full -left-3 ring-8 ring-white text-red-600 text-xs font-bold">29</span>
+                            <h4 class="font-semibold text-slate-800">27-29 Juni: Investigasi & Suspend</h4>
+                            <p class="text-sm text-slate-600 mt-1">Inspeksi detail menemukan defleksi dek akibat beban AHU. Rapat memutuskan penangguhan commissioning 1.5T Crane untuk re-analisis struktural.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab switching logic
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Chart.js initialization
+        const ctx = document.getElementById('deflectionChart').getContext('2d');
+        const deflectionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Toleransi Pabrik', 'Defleksi Aktual Dek'],
+                datasets: [{
+                    label: 'Milimeter (mm)',
+                    data: [2.0, 3.01],
+                    backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)', // Emerald green for safe limit
+                        'rgba(239, 68, 68, 0.8)'  // Red for actual warning
+                    ],
+                    borderColor: [
+                        'rgb(21, 128, 61)',
+                        'rgb(185, 28, 28)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Makes it a horizontal bar chart
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + ' mm';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 4.0,
+                        title: { display: true, text: 'Deviasi (mm)', font: {size: 12} }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
